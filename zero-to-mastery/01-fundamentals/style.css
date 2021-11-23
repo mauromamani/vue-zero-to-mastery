@@ -1,3 +1,7 @@
+body {
+  background-color: gray;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -5,4 +9,29 @@
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+[v-cloak] {
+  display: none;
+}
+
+.circle {
+  width: 150px;
+  height: 150px;
+  border-radius: 100%;
+  text-align: center;
+  color: white;
+  background-color: red;
+}
+
+.purple {
+  background-color: purple;
+}
+
+.black {
+  color: black;
+}
+
+.orange {
+  color: orange;
 }

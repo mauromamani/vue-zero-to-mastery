@@ -5,23 +5,110 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite App</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
   <body>
-    <div id="app">
+    <!--
+      DIRECTIVES
+      v-cloak: cuando el componente este montado se removerá automaticamente, manejamos de manera manual 
+      v-model: con esto actualizamos la info del input en la data de vue
+      v-bind: insertamos contenido dinamico dentro de atributos - short hand -> :attribute
+      v-html: insertamos html
+      EVENTS
+      v-on: manera de llamar eventos -> v-on:event - short hand @event
+      v-on.modifiers: se llaman metodos como preventDefault o stopPropagation -> @click.modifier
+      keyboard-modifiers: se pueden aplicar a los eventos - ej @click.ctrl || @keyup.enter
+      v-models modifiers: trim lazy number
+    -->
+
+    <div id="app" v-cloak>
       <h1>
-        {{ fullName() }}
-        {{ `Information: ${firstName} ${lastName}` }}
+        {{ fullName }}
       </h1>
+      <p>
+        <a :href="google" target="_blank">Google</a>
+      </p>
+      <p v-html="rawUrl" />
+      <p>{{ typeof age }}</p>
+      <hr />
+
+      <label for="firstName">First Name</label>
+      <input type="text" id="firstName" v-model.lazy.trim="firstName" />
+
+      <label for="middleName">Middle Name</label>
+      <input type="text" id="middleName" @keyup.enter="updateMiddleName" /><!-- Se activa cuando presionamos enter -->
+
+      <label for="lastName">Last Name</label>
+      <input type="text" id="lastName" :value="lastName" @input.prevent="updateLastName('last name triggered', $event)" />
+
+      <label for="age">Age</label>
+      <input type="number" id="age" v-model.number="age" />
+
+      <!-- Events -->
+      <h2>EVENTS</h2>
+      <hr />
+      <button @click="increment">Increment +1</button>
+      <button @click.ctrl="decrement">Decrement -1</button>
+
+      <hr>
+
+      <!-- WORKING WITH CLASSES & STYLES -->
+      <select v-model="selectedColor">
+        <option value="">White</option>
+        <option value="black">Black</option>
+        <option value="orange">Orange</option>
+      </select>
+
+      <label>Size</label>
+      <input type="number" v-model="size" >
+
+      <hr />
+      <label><input type="checkbox" v-model="isPurple"/>Purple</label>
+      <div class="circle" :class="[selectedColor, circleClasses]" 
+       :style="
+        [
+          { width: size + 'px', height: size + 'px' },
+          { transform: 'rotate(30deg)' },
+        ]">
+        Hi
+      </div>
+
+      <hr>
+      <!-- CONDITIONAL RENDERING -->
+      <h2>CONDITIONAL RENDERING</h2>
+      <p v-if="mode == 1"> Showing v-if directive content</p>
+      <template v-else-if="mode == 2">
+        <p>El template es como el de React</p>
+        <p>v-else-if</p>
+      </template>
+      <p v-else>else</p>
+
+      <select v-model="mode">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+      </select>
+      <hr>
+
+      <!-- v-show -->
+      <i v-show="mode == 1">V-Show</i>
+      <hr>
+
+      <!-- LISTS -->
+      <h2>LISTS</h2>
+      <ul>
+        <li v-for="(bird, idx) in birds">
+          {{ bird }} {{ idx }}
+        </li>
+      </ul>
+
+      <ul>
+        <li v-for="person in people" :key="person.name">
+          Name: {{ person.name }} - Age: {{ person.age}}
+        </li>
+      </ul>
     </div>
 
-    <!--
-    <div id="app2">
-      <h1>
-        {{ firstName }}
-        {{ lastName }}
-      </h1>
-    </div>
-    -->
 
     <script src="https://unpkg.com/vue@next"></script>
     <script type="module" src="/main.js"></script>
