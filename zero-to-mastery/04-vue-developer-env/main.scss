@@ -1,0 +1,9 @@
+$red: #CC3244;
+
+h1 {
+  color: $red;
+  transform: rotate(-7deg);
+   &:hover {
+     color: black
+   }
+}
