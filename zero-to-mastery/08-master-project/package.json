@@ -8,6 +8,8 @@
     "test": "jest"
   },
   "dependencies": {
+    "@vee-validate/rules": "^4.5.7",
+    "vee-validate": "^4.5.7",
     "vue": "^3.2.16",
     "vue-router": "4",
     "vuex": "^4.0.2"
