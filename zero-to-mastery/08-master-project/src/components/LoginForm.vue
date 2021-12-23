@@ -1,6 +1,6 @@
 <template>
   <div
-    class="p-5 mb-4 rounded text-white text-center font-bold "
+    class="p-5 mb-4 rounded text-white text-center font-bold"
     v-if="logShowAlert"
     :class="logAlertVariant"
   >
@@ -55,15 +55,32 @@ export default {
     };
   },
   methods: {
-    handleLogin(values) {
+    async handleLogin(values) {
       this.logInSubmission = true;
       this.logShowAlert = true;
       this.logAlertVariant = "bg-blue-500";
       this.logAlertMsg = "Please wait! We are logging you in.";
 
+      try {
+        await this.$store.dispatch("loginUser", values);
+      } catch (err) {
+        // Handling bad response
+        console.log(err);
+        this.logInSubmission = false;
+        this.logAlertVariant = "bg-red-500";
+        this.logAlertMsg = "Invalid login details.";
+        return;
+      }
+
+      /*
+       * ---------------------------
+       * Successfully Login
+       * ---------------------------
+       */
+
       this.logAlertVariant = "bg-green-500";
       this.logAlertMsg = "Success! You are now logged in.";
-      console.log(values);
+      window.location.reload();
     },
   },
 };

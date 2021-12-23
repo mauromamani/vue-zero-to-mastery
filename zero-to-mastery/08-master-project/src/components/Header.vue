@@ -8,14 +8,21 @@
         <!-- Primary Navigation -->
         <ul class="flex flex-row mt-1">
           <!-- Navigation Links -->
-          <li>
+          <li v-if="!userLoggedIn">
             <a class="px-2 text-white" href="#" @click.prevent="handleAuthModal"
               >Login / Register</a
             >
           </li>
-          <li>
-            <a class="px-2 text-white" href="#">Manage</a>
-          </li>
+          <template v-else>
+            <li>
+              <a class="px-2 text-white" href="#">Manage</a>
+            </li>
+            <li>
+              <a class="px-2 text-white" href="#" @click.prevent="logoutUser"
+                >Logout</a
+              >
+            </li>
+          </template>
         </ul>
       </div>
     </nav>
@@ -23,12 +30,16 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import { mapMutations, mapState, mapActions } from "vuex";
 
 export default {
   name: "Header",
+  computed: {
+    ...mapState(["userLoggedIn"]),
+  },
   methods: {
     ...mapMutations(["handleAuthModal"]),
+    ...mapActions(["logoutUser"]),
     /*
     Una manera de poder cambiar los valores del state, no es buena porque tenemos que hacer una funcion nueva para llamar
     a la funcion declarada en el store

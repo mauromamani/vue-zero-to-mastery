@@ -1,6 +1,10 @@
 <template>
   <!-- Registration Form -->
-  <div class="p-5 mb-4 rounded text-white text-center font-bold" v-if="regShowAlert" :class="regAlertVariant">
+  <div
+    class="p-5 mb-4 rounded text-white text-center font-bold"
+    v-if="regShowAlert"
+    :class="regAlertVariant"
+  >
     {{ regAlertMsg }}
   </div>
   <vee-form
@@ -44,11 +48,7 @@
     <div class="mb-3">
       <label class="inline-block mb-2">Password</label>
       <!-- manera de loopear los errores para que se muestren todos, para una mejor experiencia de usuario -->
-      <vee-field
-        name="password"
-        :bails="false"
-        v-slot="{ field, errors }"
-      >
+      <vee-field name="password" :bails="false" v-slot="{ field, errors }">
         <input
           type="password"
           class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
@@ -108,6 +108,8 @@
 </template>
 
 <script>
+import { getAuth, usersCollection } from "../plugins/firebase.js";
+
 export default {
   name: "RegisterForm",
   data() {
@@ -122,27 +124,44 @@ export default {
         tos: "tos",
       },
       userData: {
-        country: "USA"
+        country: "USA",
       },
       regInSubmission: false,
       regShowAlert: false,
-      regAlertVariant: 'bg-blue-500',
-      regAlertMsg: 'Please wait! Your account is being created.'
+      regAlertVariant: "bg-blue-500",
+      regAlertMsg: "Please wait! Your account is being created.",
     };
-
   },
   methods: {
-    handleRegister(values) {
+    async handleRegister(values) {
       this.regShowAlert = true;
       this.regInSubmission = true;
       this.regAlertVariant = "bg-blue-500";
       this.regAlertMsg = "Please wait! Your account is being created.";
 
+      try {
+        await this.$store.dispatch("registerUser", values);
+      } catch (err) {
+        // Handling bad response
+        console.log(err);
+        this.regInSubmission = false;
+        this.regAlertVariant = "bg-red-500";
+        this.regAlertMsg =
+          "Error! Something went wrong. Please try again later.";
+        return;
+      }
+
+      /*
+       * ---------------------------
+       * Successfully Registration
+       * ---------------------------
+       */
+
+      // handling success response
       this.regAlertVariant = "bg-green-500";
       this.regAlertMsg = "Success! Your account has been created.";
-
-      console.log(values);
+      window.location.reload();
     },
-  }
-}
+  },
+};
 </script>

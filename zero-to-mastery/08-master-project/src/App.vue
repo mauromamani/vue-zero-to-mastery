@@ -268,6 +268,10 @@ export default {
   components: {
     AppHeader,
     AuthModal
-  }
+  },
+  // life cicle hook
+  created() {
+    this.$store.dispatch("initLogin");
+  },
 };
 </script>
