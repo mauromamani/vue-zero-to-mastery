@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import store from './store';
+import router from './router';
 import VeeValidationPlugin from './plugins/validation';
 import { getAuth } from './plugins/firebase';
 
@@ -17,6 +18,7 @@ getAuth.onAuthStateChanged(() => {
     app = createApp(App);
 
     app.use(store);
+    app.use(router);
     app.use(VeeValidationPlugin);
 
     app.mount('#app');
