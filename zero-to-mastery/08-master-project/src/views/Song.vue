@@ -10,6 +10,7 @@
       <button
         type="button"
         class="z-50 h-24 w-24 text-3xl bg-white text-black rounded-full focus:outline-none"
+        @click.prevent="newSong(song)"
       >
         <i class="fas fa-play"></i>
       </button>
@@ -93,30 +94,30 @@ import {
   songsCollection,
   getAuth,
   commentsCollection,
-} from "../plugins/firebase.js";
-import { mapState } from "vuex";
+} from '../plugins/firebase.js';
+import { mapState, mapActions } from 'vuex';
 
 export default {
-  name: "Song",
+  name: 'Song',
   data() {
     return {
       song: {},
       schema: {
-        comment: "required|min:3",
+        comment: 'required|min:3',
       },
       comments: [],
       comment_in_submission: false,
       comment_show_alert: false,
-      comment_alert_variant: "bg-blue-500",
-      comment_alert_message: "Please wait! Yout comment is being submitted",
-      sort: "1",
+      comment_alert_variant: 'bg-blue-500',
+      comment_alert_message: 'Please wait! Yout comment is being submitted',
+      sort: '1',
     };
   },
   async created() {
     // consulta a la base de datos
     const docSnapshot = await songsCollection.doc(this.$route.params.id).get();
     if (!docSnapshot.exists) {
-      this.$router.push({ name: "home" });
+      this.$router.push({ name: 'home' });
       return;
     }
 
@@ -124,20 +125,21 @@ export default {
     const { sort } = this.$route.query;
 
     // verificando la validez de la query
-    this.sort = sort === "1" || sort === "2" ? sort : "1";
+    this.sort = sort === '1' || sort === '2' ? sort : '1';
 
     // agregando al state la informacion de la cancion
     this.song = docSnapshot.data();
     this.getComments();
   },
   methods: {
+    ...mapActions(['newSong']),
     // submitForm: add a comment to firebase
     async submitForm(values, ctx) {
       this.comment_in_submission = true;
       this.comment_show_alert = true;
-      this.comment_alert_variant = "bg-blue-500";
+      this.comment_alert_variant = 'bg-blue-500';
       this.comment_alert_message =
-        "Please wait! Yout comment is being submitted";
+        'Please wait! Yout comment is being submitted';
 
       // creando el comentario
       const comment = {
@@ -154,7 +156,7 @@ export default {
       // modificar el comment_count de la cancion
       this.song.comment_count += 1;
       await songsCollection.doc(this.$route.params.id).update({
-        comment_count: this.song.comment_count
+        comment_count: this.song.comment_count,
       });
 
       // agregarlo al state
@@ -162,15 +164,15 @@ export default {
 
       this.comment_in_submission = false;
       this.comment_show_alert = true;
-      this.comment_alert_variant = "bg-green-500";
-      this.comment_alert_message = "Success! Comment added";
+      this.comment_alert_variant = 'bg-green-500';
+      this.comment_alert_message = 'Success! Comment added';
 
       // usamos el ctx para resetear el comentario
       ctx.resetForm();
     },
     async getComments() {
       const commentsSnapshot = await commentsCollection
-        .where("songId", "==", this.$route.params.id)
+        .where('songId', '==', this.$route.params.id)
         .get();
 
       this.comments = [];
@@ -187,10 +189,10 @@ export default {
     },
   },
   computed: {
-    ...mapState(["userLoggedIn"]),
+    ...mapState(['userLoggedIn']),
     sortedComments() {
       return this.comments.slice().sort((a, b) => {
-        if (this.sort === "1") {
+        if (this.sort === '1') {
           return new Date(b.datePosted) - new Date(a.datePosted);
         }
 

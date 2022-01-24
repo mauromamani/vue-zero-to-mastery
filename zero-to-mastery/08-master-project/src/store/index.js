@@ -1,17 +1,36 @@
 import { createStore } from 'vuex';
 import { getAuth, usersCollection } from '../plugins/firebase.js';
+import { Howl } from 'howler';
+import { formatTime } from '../utils/formatTime.js';
 
 const store = new createStore({
   state: {
     authModalShow: false,
     userLoggedIn: false,
+    currentSong: {},
+    sound: {},
+    seek: '00:00',
+    duration: '00:00',
   },
   mutations: {
     handleAuthModal: (state) => (state.authModalShow = !state.authModalShow),
     handleAuth: (state) => (state.userLoggedIn = !state.userLoggedIn),
+    newSong: (state, payload) => {
+      state.currentSong = payload;
+      state.sound = new Howl({
+        src: [payload.url],
+        html5: true,
+      });
+    },
+    updatePosition: (state) => {
+      state.seek = formatTime(state.sound.seek());
+      state.duration = formatTime(state.sound.duration());
+    },
   },
   getters: {
     //getAuthModalShow: (state) => state.authModalShow,
+    getPlaying: (state) =>
+      state.sound.playing ? state.sound.playing() : false,
   },
   actions: {
     async registerUser(ctx, payload) {
@@ -54,6 +73,36 @@ const store = new createStore({
       // if exists user change the state
       if (user) {
         ctx.commit('handleAuth');
+      }
+    },
+    async newSong(ctx, payload) {
+      ctx.commit('newSong', payload);
+      // es necesario que se ejecute la funcion play para poder comenzar la reproduccion del sonido
+      ctx.state.sound.play();
+
+      ctx.state.sound.on('play', () => {
+        requestAnimationFrame(() => {
+          ctx.dispatch('progress');
+        });
+      });
+    },
+    async toggleAudio(ctx) {
+      // asegurando que no se este reproduciendo algo
+      if (!ctx.state.sound.playing) return;
+
+      if (ctx.state.sound.playing()) {
+        ctx.state.sound.pause();
+      } else {
+        ctx.state.sound.play();
+      }
+    },
+    progress(ctx) {
+      ctx.commit('updatePosition');
+
+      if (ctx.state.sound.playing()) {
+        requestAnimationFrame(() => {
+          ctx.dispatch('progress');
+        });
       }
     },
   },
