@@ -11,6 +11,7 @@ const store = new createStore({
     sound: {},
     seek: '00:00',
     duration: '00:00',
+    playerProgress: '0%',
   },
   mutations: {
     handleAuthModal: (state) => (state.authModalShow = !state.authModalShow),
@@ -23,8 +24,12 @@ const store = new createStore({
       });
     },
     updatePosition: (state) => {
+      // duracion y minutos de la cancion que se reproduce
       state.seek = formatTime(state.sound.seek());
       state.duration = formatTime(state.sound.duration());
+      state.playerProgress = `${
+        (state.sound.seek() / state.sound.duration()) * 100
+      }%`;
     },
   },
   getters: {
@@ -76,10 +81,16 @@ const store = new createStore({
       }
     },
     async newSong(ctx, payload) {
+      // evitando que muchas canciones se reproduzcan al mismo tiempo
+      if (ctx.state.sound instanceof Howl) {
+        ctx.state.sound.unload();
+      }
+
       ctx.commit('newSong', payload);
       // es necesario que se ejecute la funcion play para poder comenzar la reproduccion del sonido
       ctx.state.sound.play();
 
+      // mientras se este ejecutando la funcion llamamos a otra action
       ctx.state.sound.on('play', () => {
         requestAnimationFrame(() => {
           ctx.dispatch('progress');
@@ -99,11 +110,26 @@ const store = new createStore({
     progress(ctx) {
       ctx.commit('updatePosition');
 
+      // como requestAnimationFrame no es recursiva usamos este condicional para llamar al mutation y actualizar el state
       if (ctx.state.sound.playing()) {
         requestAnimationFrame(() => {
           ctx.dispatch('progress');
         });
       }
+    },
+    updateSeek({ state, dispatch }, payload) {
+      if (!state.sound.playing) return;
+
+      const { x, width } = payload.currentTarget.getBoundingClientRect();
+      const clickX = payload.clientX - x;
+      const percentage = clickX / width;
+      const seconds = state.sound.duration() * percentage;
+
+      // update seek
+      state.sound.seek(seconds);
+      state.sound.once('seek', () => {
+        dispatch('progress');
+      });
     },
   },
   modules: {},
