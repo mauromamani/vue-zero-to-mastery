@@ -3,6 +3,7 @@ import App from './App.vue';
 import store from './store';
 import router from './router';
 import VeeValidationPlugin from './plugins/validation';
+import Icon from './directives/icon';
 import { getAuth } from './plugins/firebase';
 
 import './assets/css/tailwind.css';
@@ -20,6 +21,7 @@ getAuth.onAuthStateChanged(() => {
     app.use(store);
     app.use(router);
     app.use(VeeValidationPlugin);
+    app.directive('icon', Icon);
 
     app.mount('#app');
   }
