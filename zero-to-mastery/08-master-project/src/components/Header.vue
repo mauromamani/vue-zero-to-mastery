@@ -37,30 +37,44 @@
             </li>
           </template>
         </ul>
+
+        <ul class="flex flex-row mt-1 ml-auto">
+          <li>
+            <a class="px-2 text-white" href="#" @click.prevent="changeLocale">
+              {{ currentLocale }}
+            </a>
+          </li>
+        </ul>
       </div>
     </nav>
   </header>
 </template>
 
 <script>
-import { mapMutations, mapState } from "vuex";
+import { mapMutations, mapState } from 'vuex';
 
 export default {
-  name: "Header",
+  name: 'Header',
   computed: {
-    ...mapState(["userLoggedIn"]),
+    ...mapState(['userLoggedIn']),
+    currentLocale() {
+      return this.$i18n.locale === 'en' ? 'English' : 'Español';
+    },
   },
   methods: {
-    ...mapMutations(["handleAuthModal"]),
+    ...mapMutations(['handleAuthModal']),
     // ...mapActions(["logoutUser"]),
     logoutUser() {
       // hacemos el dispatch aqui ya que queremos redireccionar al usuario al home
-      this.$store.dispatch("logoutUser");
+      this.$store.dispatch('logoutUser');
 
       // vamos a redireccionar al home en caso de que este en una ruta privada,
       if (this.$route.meta.requiresAuth) {
-        this.$router.push({ name: "home" });
+        this.$router.push({ name: 'home' });
       }
+    },
+    changeLocale() {
+      this.$i18n.locale = this.$i18n.locale === 'en' ? 'es' : 'en';
     },
     /*
     Una manera de poder cambiar los valores del state, no es buena porque tenemos que hacer una funcion nueva para llamar

@@ -5,6 +5,7 @@ import router from './router';
 import VeeValidationPlugin from './plugins/validation';
 import Icon from './directives/icon';
 import { getAuth } from './plugins/firebase';
+import i18n from './plugins/i18n';
 
 import './assets/css/tailwind.css';
 import './assets/css/main.css';
@@ -18,6 +19,7 @@ getAuth.onAuthStateChanged(() => {
   if (!app) {
     app = createApp(App);
 
+    app.use(i18n);
     app.use(store);
     app.use(router);
     app.use(VeeValidationPlugin);
